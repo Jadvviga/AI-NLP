@@ -20,10 +20,10 @@ TRAIN_DATA_PATH = "data/train_data.txt"
 
 # read train data set
 df_train = utils.load_data(TRAIN_DATA_PATH)
-#print(df_train["genre"])
-#print(df_train["genre"][0])
+print(df_train["genre"])
+print(df_train["genre"][0])
 
 # read test data set
 df_test = utils.load_data(TEST_SOLUTION_DATA_PATH)
-#print(df_test.head())
+print(df_test.head())
 

@@ -8,6 +8,6 @@ def load_data(filename):
     df_train = pd.read_csv(filename, sep=':::',
                            engine='python', header=None,
                            usecols=[1, 2, 3])
-    df_train.rename(columns={1: 'title', 2: 'genre', 3: 'description'}, inplace=True)
+    df_train.rename(columns={0: "id",1: 'title', 2: 'genre', 3: 'description'}, inplace=True)
 
     return df_train
