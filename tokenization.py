@@ -10,10 +10,34 @@ from tokenizers.trainers import WordLevelTrainer, BpeTrainer, WordPieceTrainer
 from tokenizers.models import WordLevel, BPE, WordPiece
 import numpy as np
 
+
 def load_tokenizer(filename):
-    with open(filename, 'rb') as handle:
-        tokenizer = pickle.load(handle)
+    with open(filename, 'rb') as infile:
+        tokenizer = pickle.load(infile)
     return tokenizer
+
+
+def encodings_normalize_length(encodings, target_length, padding_token='[PAD]'):
+    """
+    Takes list of tokenizers.Encoding and truncates / right pads it to the desired length.
+    In place.
+    """
+    for index in range(len(encodings)):
+        encodings[index].truncate(target_length)
+        encodings[index].pad(length=target_length, direction="right", pad_token=padding_token)
+
+
+def encodings_get_length_greater_than(encodings, percentage):
+    """
+    Takes encodings list as parameter and
+    returns a length of encoding that is bigger than
+    than <percentage>% of entries in the list.
+    """
+    encoding_lengths = list(map(len, encodings))
+    percentile_value = np.percentile(encoding_lengths, percentage)
+
+    return int(percentile_value)
+
 
 if __name__ == '__main__':
     TEST_SOLUTION_DATA_PATH = "data/test_data_solution.txt"
@@ -28,7 +52,6 @@ if __name__ == '__main__':
     # make everything lower case and remove trailing whitespaces
     df_test['description'] = df_test['description'].apply(lambda x: x.lower().strip())
     df_test['genre'] = df_test['genre'].apply(lambda x: x.lower().strip())
-
 
     """ 
     tokenizerWP = Tokenizer(WordPiece(unk_token='[UNK]'))
@@ -71,8 +94,8 @@ if __name__ == '__main__':
     """
     tokenizerBPE = Tokenizer(BPE(unk_token='[UNK]', dropout=None))
     # train tokenizer
-    trainer = BpeTrainer(special_tokens=['[UNK]', '[CLS]', '[SEP]', '[PAD]'], \
-                         continuing_subword_prefix='##', \
+    trainer = BpeTrainer(special_tokens=['[UNK]', '[CLS]', '[SEP]', '[PAD]'],
+                         continuing_subword_prefix='##',
                          vocab_size=10000)
     tokenizerBPE.normalizer = StripAccents()  # add method for stripping accents
     tokenizerBPE.pre_tokenizer = Sequence([WhitespaceSplit(), Punctuation(behavior='removed')])

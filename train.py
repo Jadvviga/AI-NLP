@@ -16,7 +16,6 @@ import string
 # nltk.download('stopwords') # only required for the first time
 
 if __name__ == '__main__':
-
     TEST_SOLUTION_DATA_PATH = "data/test_data_solution.txt"
     TRAIN_DATA_PATH = "data/train_data.txt"
     TOKENIZER_PATH = "tokenizers/tokenizerWP.pickle"
@@ -30,9 +29,16 @@ if __name__ == '__main__':
     df_test = utils.load_data(TEST_SOLUTION_DATA_PATH)
     print(df_test.head())
 
-    #load tokenizer from file
+    # load tokenizer from file
     tokenizer = tokenization.load_tokenizer(TOKENIZER_PATH)
     outFull = tokenizer.encode_batch(df_test['description'])
 
-    print(len(outFull))
+    target_length = tokenization.encodings_get_length_greater_than(encodings=outFull, percentage=80)
+    tokenization.encodings_normalize_length(outFull, target_length=target_length)
+
+
+    print(df_test['description'][0])
     print(outFull[0].tokens)
+
+
+
