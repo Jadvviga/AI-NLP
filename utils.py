@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
+
 def choose_file_to_load(folder_path):
     """
     Lists all files in provided folder and asks user to select one of them.
@@ -16,16 +17,15 @@ def choose_file_to_load(folder_path):
     return list_of_files[chosen_id]
 
 
-def model_filename_parse_dimension(file_name):
+def model_filename_parse_targetlength(file_name):
     """
-    Parses a model filename of format ..._dim1_dim2.extension,
-    Takes filename as parameter and returns 2 integer tuple of (dim1, dim2)
+    Parses a model filename of format ..._targetlen.extension,
+    Takes filename as parameter and returns an integer, targetlen
     """
 
     extension_removed = file_name.split('.')[-2]
-    dimensions = extension_removed.split("_")[-2:]
-    dimensions = [int(dim) for dim in dimensions]
-    return dimensions
+    target_len = int(extension_removed.split("_")[-1])
+    return target_len
 
 
 def load_data(filename):
@@ -42,7 +42,7 @@ def load_data(filename):
 
 
 def get_labels_dict(genres):
-    genres = sorted(genres) # i sort it to arrive always to the same labels dict
+    genres = sorted(genres)  # i sort it to arrive always to the same labels dict
     label_dict = {}
     label = 0
     for item in genres:
