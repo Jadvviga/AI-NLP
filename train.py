@@ -1,7 +1,9 @@
 import utils
 import tokenization
+import model
 
 # required modules
+import tenserflow as tf
 import pandas as pd
 import seaborn
 import matplotlib.pyplot as plt
@@ -40,5 +42,16 @@ if __name__ == '__main__':
     print(df_test['description'][0])
     print(outFull[0].tokens)
 
+    model = model.makeModelLSTM(target_length)
+
+    callback = tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', min_delta=0.0001, patience=5, restore_best_weights=True)
+
+    history = model.fit(data_generator_train, validation_data=data_generator_test, epochs=5)
+    model_filename = f"testing_model_{INPUT_SHAPE[0]}_{INPUT_SHAPE[1]}.h5"
+    model.save(f"models/{model_filename}")
+
+    utils.make_plots_from_history(history,PLOTS_PATH, model_filename)
+
+    
 
 
