@@ -13,9 +13,9 @@ import numpy as np
 import nltk
 import string
 
-# nltk.download('punkt') # only required for the first time
-# nltk.download('averaged_perceptron_tagger') # only required for the first time
-# nltk.download('stopwords') # only required for the first time
+#nltk.download('punkt') # only required for the first time
+#nltk.download('averaged_perceptron_tagger') # only required for the first time
+#nltk.download('stopwords') # only required for the first time
 
 if __name__ == '__main__':
     TEST_SOLUTION_DATA_PATH = "data/test_data_solution.txt"
