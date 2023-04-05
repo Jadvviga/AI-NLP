@@ -12,7 +12,10 @@ fr_en_model = MarianMTModel.from_pretrained(fr_en_model_name)
 
 en_lang, fr_lang = 'en', 'fr'
 
-original_texts = ["This article aims to perform the back translation for text data augmentation"]
+original_texts = ["This article aims to perform the back translation for text data augmentation",
+          "It is the 25th article by Zoumana on Medium. He loves to give back to the community",
+          "The first model translates from English to French, which is a temporary process", 
+          "The second model finally translates back all the temporary french text into English"]
 
 def getTextsWithLangCode(language_code, texts):
     texts_with_code = [">>{}<< {}".format(language_code, text) for text in texts]
