@@ -3,10 +3,12 @@ import random
 
 import utils
 
+
 # EN-FR model + tokenizer
 en_fr_model_name = 'Helsinki-NLP/opus-mt-en-fr'
 en_fr_model_tkn = MarianTokenizer.from_pretrained(en_fr_model_name)
 en_fr_model = MarianMTModel.from_pretrained(en_fr_model_name)
+
 
 # FR-EN model + tokenizer
 fr_en_model_name = 'Helsinki-NLP/opus-mt-fr-en'
@@ -28,14 +30,16 @@ def getTextsWithLangCode(language_code, texts):
 
 def translate(texts, model, tokenizer, language=fr_lang):
     texts_with_code = getTextsWithLangCode(language, texts)
-    # translation with model + changing tokens bakc into text
-    translated = model.generate(**tokenizer(texts_with_code, return_tensors="pt", padding=True), max_length=10000)
+    # translation with model + changing tokens back into text
+    # tokenizer WILL TRUNCATE - too long text will be cut to deafult len
+    translated = model.generate(**tokenizer(texts_with_code, return_tensors="pt", padding=True, truncation=True), max_new_tokens=10000)
     translated_texts = [tokenizer.decode(t, skip_special_tokens=True) for t in translated]
 
     return translated_texts
 
 
 def augmentationBackTranslation(texts):
+    print('here')
     fr_translated_batch = translate(texts, en_fr_model, en_fr_model_tkn, fr_lang)
     en_back_translated_batch = translate(fr_translated_batch, fr_en_model, fr_en_model_tkn, en_lang)
     return en_back_translated_batch
@@ -61,11 +65,6 @@ def save_to_csv(descriptions_dict, filename):
 
 
 if __name__ == '__main__':
-    # augmented_texts = augmentationBackTranslation(original_texts)
-    # print(f"Original [{len(original_texts)}]: ")
-    # print(*original_texts, sep='\n')
-    # print(f"Augmented (Back Translation) [{len(augmented_texts)}]:")
-    # print(*augmented_texts, sep='\n')
 
     TRAIN_DATA_PATH = "data/train_data.txt"
     OUTPUT_DATA_PATH = "data/train_augmented_data.txt"
