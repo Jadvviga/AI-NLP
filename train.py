@@ -8,6 +8,7 @@ import pandas as pd
 import seaborn
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 # optional modules
 import nltk
@@ -19,18 +20,17 @@ import string
 
 if __name__ == '__main__':
     TEST_SOLUTION_DATA_PATH = "data/test_data_solution.txt"
-    TRAIN_DATA_PATH = "data/train_data.txt"
-    TOKENIZER_PATH = "tokenizers/tokenizerWP.pickle"
+    #TRAIN_DATA_PATH = "data/train_data.txt"
+    TRAIN_DATA_PATH = 'data/train_data_stratified_1500.txt'
+    TOKENIZERS_PATH = "tokenizers"
     PLOTS_PATH = "metrics/plots"
 
     # read train data set
     df_train = utils.load_data(TRAIN_DATA_PATH)
-    # print(df_train["genre"])
-    # print(df_train["genre"][0])
-
     # read test data set
     df_test = utils.load_data(TEST_SOLUTION_DATA_PATH)
-    # print(df_test.head())
+
+    tokenizer_filename = utils.choose_file_to_load(TOKENIZERS_PATH)
 
     labels_dict = utils.get_labels_dict(df_train["genre"])
 
@@ -41,7 +41,7 @@ if __name__ == '__main__':
     Y_train = tf.keras.utils.to_categorical(labels_train, num_classes=len(labels_dict))
 
     # load tokenizer from file
-    tokenizer = tokenization.load_tokenizer(TOKENIZER_PATH)
+    tokenizer = tokenization.load_tokenizer(os.path.join(TOKENIZERS_PATH, tokenizer_filename))
     tokenized_descriptions_train = tokenizer.encode_batch(df_train['description'])
     tokenized_descriptions_test = tokenizer.encode_batch(df_test["description"])
 
