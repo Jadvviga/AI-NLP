@@ -67,7 +67,6 @@ def save_to_csv(descriptions_dict, filename):
 if __name__ == '__main__':
 
     TRAIN_DATA_PATH = "data/train_data.txt"
-    OUTPUT_DATA_PATH = "data/train_augmented_data.txt"
     TARGET_COUNT_PER_CATEGORY = 1500
 
     # creating a dict
@@ -90,8 +89,8 @@ if __name__ == '__main__':
         if len(dict_of_descriptions[key]) <= TARGET_COUNT_PER_CATEGORY:
             new_list = list(dict_of_descriptions[key])
             while len(new_list) < TARGET_COUNT_PER_CATEGORY:
-                #new_list.extend(augmentationBackTranslation(dict_of_descriptions[key]))
-                new_list.extend(dict_of_descriptions[key])
+                new_list.extend(augmentationBackTranslation(dict_of_descriptions[key]))
+                #new_list.extend(dict_of_descriptions[key])
             dict_of_descriptions[key] = new_list
         # cutting excess
         dict_of_descriptions[key] = dict_of_descriptions[key][0:TARGET_COUNT_PER_CATEGORY]

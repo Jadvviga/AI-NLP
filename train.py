@@ -24,9 +24,12 @@ if __name__ == '__main__':
     TRAIN_DATA_PATH = 'data/train_data_stratified_1500.txt'
     TOKENIZERS_PATH = "tokenizers"
     PLOTS_PATH = "metrics/plots"
+    DATA_PATH = "data"
+
+    train_filename = utils.choose_file_to_load(DATA_PATH)
 
     # read train data set
-    df_train = utils.load_data(TRAIN_DATA_PATH)
+    df_train = utils.load_data(os.path.join(DATA_PATH, train_filename))
     # read test data set
     df_test = utils.load_data(TEST_SOLUTION_DATA_PATH)
 
@@ -67,9 +70,9 @@ if __name__ == '__main__':
     print(X_train)
     print(Y_train.shape)
     print(Y_train)
-    history = model.fit(X_train, Y_train, validation_data=(X_test, Y_test), batch_size=20, epochs=2, callbacks=[callback])
+    history = model.fit(X_train, Y_train, validation_data=(X_test, Y_test), batch_size=20, epochs=15, callbacks=[callback])
 
-    model_filename = f"testing_model2_{target_length}.h5"
+    model_filename = f"testing_model_strat_{target_length}.h5"
     model.save(f"models/{model_filename}")
 
     utils.make_plots_from_history(history, PLOTS_PATH, model_filename)
