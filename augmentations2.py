@@ -50,7 +50,7 @@ def save_to_csv(descriptions_dict, filename):
 if __name__ == '__main__':
 
     TRAIN_DATA_PATH = "data/train_data.txt"
-    TARGET_COUNT_PER_CATEGORY = 1500
+    TARGET_COUNT_PER_CATEGORY = 500
 
     # creating a dict
     df_train = utils.load_data(TRAIN_DATA_PATH)
@@ -67,10 +67,11 @@ if __name__ == '__main__':
             new_list = list(dict_of_descriptions[key])
             while len(new_list) < TARGET_COUNT_PER_CATEGORY:
                 new_list.extend(synonym_aug_batch(dict_of_descriptions[key]))
+                #new_list.extend(list(dict_of_descriptions[key]))
             dict_of_descriptions[key] = new_list
         # cutting excess
         dict_of_descriptions[key] = dict_of_descriptions[key][0:TARGET_COUNT_PER_CATEGORY]
     for genre, list_ in dict_of_descriptions.items():
         print(f'{genre} : {len(list_)}')
 
-    save_to_csv(dict_of_descriptions, f"data/train_data_augmented_hard_{TARGET_COUNT_PER_CATEGORY}.txt")
+    save_to_csv(dict_of_descriptions, f"data/train_data_new_{TARGET_COUNT_PER_CATEGORY}.txt")
