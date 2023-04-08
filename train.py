@@ -20,8 +20,7 @@ import string
 
 if __name__ == '__main__':
     TEST_SOLUTION_DATA_PATH = "data/test_data_solution.txt"
-    #TRAIN_DATA_PATH = "data/train_data.txt"
-    TRAIN_DATA_PATH = 'data/train_data_stratified_1500.txt'
+
     TOKENIZERS_PATH = "tokenizers"
     PLOTS_PATH = "metrics/plots"
     DATA_PATH = "data"
@@ -72,7 +71,7 @@ if __name__ == '__main__':
     print(Y_train)
     history = model.fit(X_train, Y_train, validation_data=(X_test, Y_test), batch_size=20, epochs=15, callbacks=[callback])
 
-    model_filename = f"testing_model_strat_{target_length}.h5"
+    model_filename = f"testing_XXX_{target_length}.h5"
     model.save(f"models/{model_filename}")
 
     utils.make_plots_from_history(history, PLOTS_PATH, model_filename)

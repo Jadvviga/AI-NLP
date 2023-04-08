@@ -41,7 +41,7 @@ def encodings_get_length_greater_than(encodings, percentage):
 
 if __name__ == '__main__':
     TRAIN_DATA_PATH = "data/train_data.txt"
-    TRAIN_DATA_STRATIFIED_PATH = "data/train_data_stratified_500.txt"
+    TRAIN_DATA_STRATIFIED_PATH = "data/train_data_augmented_5000.txt"
 
     df_train = utils.load_data(TRAIN_DATA_STRATIFIED_PATH)
     # make everything lower case and remove trailing whitespaces
@@ -61,10 +61,10 @@ if __name__ == '__main__':
                                                     special_tokens=[('[CLS]', 1), ('[SEP]', 2)])
     tokenizerWP.train_from_iterator(df_train['description'], trainer=trainer, )
 
-    with open("tokenizers/tokenizerWP_stratified_500.pickle", 'wb') as handle:
+    with open("tokenizers/tokenizerWP_augmented_5000.pickle", 'wb') as handle:
         pickle.dump(tokenizerWP, handle, protocol=3)
 
-    tokenizerWP = load_tokenizer("tokenizers/tokenizerWP_stratified_500.pickle")
+    tokenizerWP = load_tokenizer("tokenizers/tokenizerWP_augmented_5000.pickle")
 
     vocabSize = tokenizerWP.get_vocab_size()
     print('size of vocabulary: {}'.format(vocabSize))
@@ -83,10 +83,10 @@ if __name__ == '__main__':
     tokenizerBPE.post_processor = ByteLevel(trim_offsets=True)
     tokenizerBPE.train_from_iterator(df_train['description'], trainer=trainer)
 
-    with open("tokenizers/tokenizerBPE_stratified_500.pickle", 'wb') as handle:
+    with open("tokenizers/tokenizerBPE_augmented_5000.pickle", 'wb') as handle:
         pickle.dump(tokenizerBPE, handle, protocol=3)
 
-    tokenizerBPE = load_tokenizer("tokenizers/tokenizerBPE_stratified_500.pickle")
+    tokenizerBPE = load_tokenizer("tokenizers/tokenizerBPE_augmented_5000.pickle")
 
     vocabSize = tokenizerBPE.get_vocab_size()
     print('size of vocabulary: {}'.format(vocabSize))
