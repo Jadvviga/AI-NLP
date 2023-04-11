@@ -49,7 +49,7 @@ def save_to_csv(descriptions_dict, filename):
 
 if __name__ == '__main__':
 
-    TRAIN_DATA_PATH = "data/train_data.txt"
+    TRAIN_DATA_PATH = "data/test_4categories.txt"
     TARGET_COUNT_PER_CATEGORY = 5000
 
     # creating a dict
@@ -60,6 +60,17 @@ if __name__ == '__main__':
         if genre not in dict_of_descriptions:
             dict_of_descriptions[genre] = []
         dict_of_descriptions[genre].append(df_train["description"][i])
+
+    for genre, list_ in dict_of_descriptions.items():
+        print(f'{genre} : {len(list_)}')
+
+
+    dict_of_descriptions = {key:dict_of_descriptions[key] for key in dict_of_descriptions if key in {"documentary", "drama", "comedy"}}
+
+    save_to_csv(dict_of_descriptions, f"data/test_3categories.txt")
+
+    import sys
+    sys.exit()
 
     for key in dict_of_descriptions:
         # augmenting the categories with not enough entries

@@ -1,5 +1,7 @@
 import utils
 
+import nltk
+import os
 import pickle
 import tokenizers
 from tokenizers import Tokenizer
@@ -39,20 +41,41 @@ def encodings_get_length_greater_than(encodings, percentage):
     return int(percentile_value)
 
 
-if __name__ == '__main__':
-    TRAIN_DATA_PATH = "data/train_data.txt"
-    TRAIN_DATA_STRATIFIED_PATH = "data/train_data_augmented_5000.txt"
+# Stemming the text
+def simple_stemmer(text):
+    ps = nltk.porter.PorterStemmer()
+    text = ' '.join([ps.stem(word) for word in text.split()])
+    return text
 
-    df_train = utils.load_data(TRAIN_DATA_STRATIFIED_PATH)
+
+def remove_stopwords_and_punctuation(text):
+    stop_words = set(nltk.corpus.stopwords.words('english'))
+    word_tokens = nltk.tokenize.word_tokenize(text)
+
+    filtered = [w.lower() for w in word_tokens if not w.lower() in stop_words]
+    filtered = [w for w in filtered if w.isalpha()]
+    return ' '.join(filtered)
+
+
+if __name__ == '__main__':
+    DATA_PATH = "data"
+
+    train_filename = utils.choose_file_to_load(DATA_PATH)
+
+    df_train = utils.load_data(os.path.join(DATA_PATH,train_filename))
     # make everything lower case and remove trailing whitespaces
     df_train['description'] = df_train['description'].apply(lambda x: x.lower().strip())
     df_train['genre'] = df_train['genre'].apply(lambda x: x.lower().strip())
 
-
+    # Removing stopwords and punctuation
+    df_train['description'] = df_train['description'].apply(remove_stopwords_and_punctuation)
+    # Applying stemming
+    df_train['description'] = df_train['description'].apply(simple_stemmer)
+    print("here")
 
     tokenizerWP = Tokenizer(WordPiece(unk_token='[UNK]'))
     # train tokenizer
-    trainer = WordPieceTrainer(special_tokens=['[UNK]', '[CLS]', '[SEP]', '[PAD]'],
+    trainer = WordPieceTrainer(special_tokens=['[PAD]', '[UNK]', '[CLS]', '[SEP]'],
                                continuing_subword_prefix='##',
                                vocab_size=10000)
     tokenizerWP.normalizer = StripAccents()  # add method for stripping accents
@@ -61,10 +84,8 @@ if __name__ == '__main__':
                                                     special_tokens=[('[CLS]', 1), ('[SEP]', 2)])
     tokenizerWP.train_from_iterator(df_train['description'], trainer=trainer, )
 
-    with open("tokenizers/tokenizerWP_augmented_5000.pickle", 'wb') as handle:
+    with open("tokenizers/tokenizer_new", 'wb') as handle:
         pickle.dump(tokenizerWP, handle, protocol=3)
-
-    tokenizerWP = load_tokenizer("tokenizers/tokenizerWP_augmented_5000.pickle")
 
     vocabSize = tokenizerWP.get_vocab_size()
     print('size of vocabulary: {}'.format(vocabSize))
@@ -72,27 +93,3 @@ if __name__ == '__main__':
         print('vocabulary id: {0}, word: {1}'.format(i, tokenizerWP.id_to_token(i)))
         j = vocabSize - i - 1
         print('vocabulary id: {0}, word: {1}'.format(j, tokenizerWP.id_to_token(j)))
-
-    tokenizerBPE = Tokenizer(BPE(unk_token='[UNK]', dropout=None))
-    # train tokenizer
-    trainer = BpeTrainer(special_tokens=['[UNK]', '[CLS]', '[SEP]', '[PAD]'],
-                         continuing_subword_prefix='##',
-                         vocab_size=10000)
-    tokenizerBPE.normalizer = StripAccents()  # add method for stripping accents
-    tokenizerBPE.pre_tokenizer = Sequence([WhitespaceSplit(), Punctuation(behavior='removed')])
-    tokenizerBPE.post_processor = ByteLevel(trim_offsets=True)
-    tokenizerBPE.train_from_iterator(df_train['description'], trainer=trainer)
-
-    with open("tokenizers/tokenizerBPE_augmented_5000.pickle", 'wb') as handle:
-        pickle.dump(tokenizerBPE, handle, protocol=3)
-
-    tokenizerBPE = load_tokenizer("tokenizers/tokenizerBPE_augmented_5000.pickle")
-
-    vocabSize = tokenizerBPE.get_vocab_size()
-    print('size of vocabulary: {}'.format(vocabSize))
-    for i in range(10):
-        print('vocabulary id: {0}, word: {1}'.format(i, tokenizerBPE.id_to_token(i)))
-        j = vocabSize - i - 1
-        print('vocabulary id: {0}, word: {1}'.format(j, tokenizerBPE.id_to_token(j)))
-
-

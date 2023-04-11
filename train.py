@@ -19,7 +19,7 @@ import string
 #nltk.download('stopwords') # only required for the first time
 
 if __name__ == '__main__':
-    TEST_SOLUTION_DATA_PATH = "data/test_data_solution.txt"
+    TEST_SOLUTION_DATA_PATH = "data/test_4categories.txt"
 
     TOKENIZERS_PATH = "tokenizers"
     PLOTS_PATH = "metrics/plots"
@@ -31,6 +31,22 @@ if __name__ == '__main__':
     df_train = utils.load_data(os.path.join(DATA_PATH, train_filename))
     # read test data set
     df_test = utils.load_data(TEST_SOLUTION_DATA_PATH)
+
+
+
+    # make everything lower case and remove trailing whitespaces
+    df_train['description'] = df_train['description'].apply(lambda x: x.lower().strip())
+    df_train['genre'] = df_train['genre'].apply(lambda x: x.lower().strip())
+
+    df_test['description'] = df_test['description'].apply(lambda x: x.lower().strip())
+    df_test['genre'] = df_test['genre'].apply(lambda x: x.lower().strip())
+
+    # Preprocessing by removing stopwords, punctuation and by doing stemming
+    df_train['description'] = df_train['description'].apply(tokenization.remove_stopwords_and_punctuation)
+    df_train['description'] = df_train['description'].apply(tokenization.simple_stemmer)
+
+    df_test['description'] = df_test['description'].apply(tokenization.remove_stopwords_and_punctuation)
+    df_test['description'] = df_test['description'].apply(tokenization.simple_stemmer)
 
     tokenizer_filename = utils.choose_file_to_load(TOKENIZERS_PATH)
 
@@ -52,12 +68,12 @@ if __name__ == '__main__':
     tokenization.encodings_normalize_length(tokenized_descriptions_train, target_length=target_length)
     tokenization.encodings_normalize_length(tokenized_descriptions_test, target_length=target_length)
 
-    print(f"target_length ={target_length}")
-    print(df_test['description'][0])
-    print(tokenized_descriptions_train[0].tokens)
-    print(tokenized_descriptions_train[0].ids)
+    # print(f"target_length ={target_length}")
+    # print(df_test['description'][0])
+    # print(tokenized_descriptions_train[0].tokens)
+    # print(tokenized_descriptions_train[0].ids)
 
-    model = model.makeModelLSTM(target_length)
+    model = model.makeModelLSTM_old(target_length, num_categories=len(labels_dict))
 
     callback = tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', min_delta=0.0001, patience=5,
                                                 restore_best_weights=True)
@@ -65,13 +81,9 @@ if __name__ == '__main__':
     X_train = np.array([encoding.ids for encoding in tokenized_descriptions_train])
     X_test = np.array([encoding.ids for encoding in tokenized_descriptions_test])
 
-    print(X_train.shape)
-    print(X_train)
-    print(Y_train.shape)
-    print(Y_train)
-    history = model.fit(X_train, Y_train, validation_data=(X_test, Y_test), batch_size=20, epochs=15, callbacks=[callback])
+    history = model.fit(X_train, Y_train, validation_data=(X_test, Y_test), batch_size=20, epochs=7, callbacks=[callback])
 
-    model_filename = f"testing_XXX_{target_length}.h5"
+    model_filename = f"testing_4categories_oldmodel_{target_length}.h5"
     model.save(f"models/{model_filename}")
 
     utils.make_plots_from_history(history, PLOTS_PATH, model_filename)

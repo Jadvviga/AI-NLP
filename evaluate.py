@@ -13,8 +13,8 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, classifica
 import matplotlib
 
 if __name__ == '__main__':
-    TEST_SOLUTION_DATA_PATH = "data/test_data_solution.txt"
-    TRAIN_DATA_PATH = "data/train_data.txt"
+    #TEST_SOLUTION_DATA_PATH = "data/test_data_solution.txt"
+    TEST_SOLUTION_DATA_PATH = "data/test_4categories.txt"
 
     TOKENIZERS_PATH = "tokenizers"
     MODELS_PATH = "models"
@@ -27,6 +27,14 @@ if __name__ == '__main__':
     target_length = utils.model_filename_parse_targetlength(model_filename)
 
     df_test = utils.load_data(TEST_SOLUTION_DATA_PATH)
+
+    # Preprocessing test
+    df_test['description'] = df_test['description'].apply(lambda x: x.lower().strip())
+    df_test['genre'] = df_test['genre'].apply(lambda x: x.lower().strip())
+
+    df_test['description'] = df_test['description'].apply(tokenization.remove_stopwords_and_punctuation)
+    df_test['description'] = df_test['description'].apply(tokenization.simple_stemmer)
+
     labels_dict = utils.get_labels_dict(df_test["genre"])
 
     labels_test = np.array([labels_dict[genre] for genre in df_test["genre"]])
